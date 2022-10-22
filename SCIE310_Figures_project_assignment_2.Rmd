@@ -47,7 +47,7 @@ shareholder_tm <- treemap(df,
             
             # # Main
             title="Ownership Structure",
-            palette= wes_palette("BottleRocket1", type = "continuous"),
+            palette= wes_palette("Chevalier1", type = "continuous"),
             algorithm="pivotSize",
             mirror.y=F,
             # 
@@ -108,7 +108,29 @@ gg_ngs<-ggplot(data = ngs, aes(x = machine_price_USD, y = average_price_per_Gb_U
     guides(colour = guide_legend(title = "Company", order = 1), size = guide_legend(title = "Max cost of reagents", order = 2))
 gg_ngs
 ```
+```{r}
+tab1a_colors <- wes_palette(c("Zissou1", type = "continuous"))
 
+```
+
+
+```{r}
+# Init Ggplot
+gg_ngs<-ggplot(data = ngs, aes(x = machine_price_USD, y = average_price_per_Gb_USD, color = company, size = reagent_max_price_USD)) +
+  geom_text_repel(aes(label = platform, size = 100, segment.alpha = 0.2), 
+                  show.legend = F, #removes an 'a' in legend points
+                  force = 40, 
+                  force_pull = 2, 
+                  segment.angle = 1,
+                  segment.ncp = 10) + 
+  geom_point(alpha = 0.6) + #alpha is transparency
+  scale_fill_manual(values = wes_palette(name = "Chevalier1", type = "continuous"), name = "") +
+  labs(title = "Average Cost Per Gigabase (Gb) vs Initial Cost of Sequencing Platform",
+         x = "Initial Cost of Sequencing Platform USD",
+         y = "Average Cost Per Gb USD") +
+  guides(colour = guide_legend(title = "Company", order = 1), size = guide_legend(title = "Max cost of reagents", order = 2))
+gg_ngs
+```
 
 
 ```{r}
@@ -158,6 +180,7 @@ gg_ngs2<-ggplot(data = ngs,
   scale_y_continuous(limits=c(0, 650), breaks=seq(0,650,100))
 gg_ngs2
 ```
+
 ```{r}
 # size scaled appropriately so as not to be misleading, no cost reagent size
 gg_ngs2<-ggplot(data = ngs, 
@@ -177,6 +200,31 @@ gg_ngs2<-ggplot(data = ngs,
   scale_y_continuous(limits=c(0, 650), breaks=seq(0,650,100))
 gg_ngs2
 ```
+```{r}
+#### with nice colous. 
+# size scaled appropriately so as not to be misleading, no cost reagent size
+
+gg_ngs2<-ggplot(data = ngs, 
+                aes(x = machine_price_USD, y = average_price_per_Gb_USD, color = company)) +
+  geom_text_repel(aes(label = platform, segment.alpha = 1),
+                  size = 1.8,
+                  show.legend = F, #removes an 'a' in legend points
+                  force = 40, 
+                  force_pull = 2, 
+                  segment.angle = 1,
+                  segment.ncp = 10,
+                  color = wes_palette(19, name = "BottleRocket2", type = "continuous")) + #wtf
+  geom_point(alpha = 1, color = wes_palette(19, name = "BottleRocket2", type = "continuous")) + #transparency
+  scale_fill_manual(values = wes_palette(name = "BottleRocket2")) + 
+  labs(title = "Average Cost Per Gb vs Initial Cost of Sequencing Platform",
+         x = "Initial Cost of Sequencing Platform (USD)",
+         y = "Average Cost Per Gb (USD)") +
+  guides(color = guide_legend(title = "Company")) +
+  scale_y_continuous(limits=c(0, 650), breaks=seq(0,650,100))
+gg_ngs2
+
+##### abandoning plot will use original, no time to sus colours with grepel and 19 vs. 3 pts and alpha confusion 
+```
 
 ```{r}
 ##1000/average_price_per_Gb_USD
@@ -195,6 +243,7 @@ p<-ggplot(data=ngs, aes(x=reorder(platform, number_of_Gb_for_1k_USD), y=number_o
          x =  "Sequencing Platform",
          y = "Average Number of Gb per $1,000 USD") +
   guides(fill = guide_legend(title = "Company")) +
+  scale_fill_manual(values = wes_palette(name = "Chevalier1"), name = "") +
   theme( # remove the horizontal grid lines
          panel.grid.major.y = element_blank(),
          panel.grid.minor.x = element_line(),
@@ -206,6 +255,10 @@ p<-ggplot(data=ngs, aes(x=reorder(platform, number_of_Gb_for_1k_USD), y=number_o
   
 p
 ```
+```{r}
+names(wes_palettes)
+```
+
 ```{r}
 ## get values
 Minimum <-c(525, 315, 648, 885)
@@ -222,6 +275,7 @@ df_hg <- melt(df1, id.vars='platform')
 
 ggplot(df_hg, aes(x=platform, y=value, fill=variable)) +
   geom_bar(stat='identity', position='dodge') +
+  scale_fill_manual(values = wes_palette(name = "Chevalier1"), name = "") +
   coord_flip() +
     labs(title = "Cost of Sequencing a Human Genome (USD)",
          x =  "Sequencing Platform",
