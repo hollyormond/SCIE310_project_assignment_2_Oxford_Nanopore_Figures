@@ -25,17 +25,33 @@ df %>% mutate(Percentage = round(shares/sum(shares) * 100, 1))
 # General_Public <- 95773509
 # VC_PE_Firms <- 168420844
 # Institutional_Investors <- 404745034
+```
 
+
+```{r}
 # df
 library(wesanderson)
 #names(wes_palettes)
 
+library("viridis")  
+
+library(RColorBrewer)
+display.brewer.all()
 ```
+```{r}
+### making my own 
+cp <- c("#fca827", "#085c74", "#ac047c")
+
+#### colour blind palette 
+cbp <- c("#D99F1D", "#9A9DBF", "#752428", "#3B4C92", "#6A865A", "#4A4D65")
+```
+
 
 ```{r}
 # make treemap 
 
 library(treemap)
+tiff('own_struc.tiff', units="in", width=10, height=5, res=600, compression = 'lzw')
 
 # Plot
 shareholder_tm <- treemap(df,
@@ -47,7 +63,7 @@ shareholder_tm <- treemap(df,
             
             # # Main
             title="Ownership Structure",
-            palette= wes_palette("Chevalier1", type = "continuous"),
+            palette= cbp,
             algorithm="pivotSize",
             mirror.y=F,
             # 
@@ -56,8 +72,10 @@ shareholder_tm <- treemap(df,
             border.lwds=1,                         
             # 
             # # Labels
-            fontcolor.labels="white",
-            fontface.labels=0.5)
+            fontcolor.labels="black",
+            fontface.labels=1.0)
+
+dev.off()
 ```
 ##### Cost of sequencing technology
 ## see: https://docs.google.com/presentation/d/e/2PACX-1vTzEQ65KsEQPVoU85ezzzYtLRM7lmukkTuJbmsJLmGKmcIbg3VzdbJjMKqr3J-2ECkCEs65NxXq_VJ1/pub?start=false&loop=false&delayms=3000&slide=id.g161450d19cf_0_0
@@ -108,84 +126,13 @@ gg_ngs<-ggplot(data = ngs, aes(x = machine_price_USD, y = average_price_per_Gb_U
     guides(colour = guide_legend(title = "Company", order = 1), size = guide_legend(title = "Max cost of reagents", order = 2))
 gg_ngs
 ```
-```{r}
-tab1a_colors <- wes_palette(c("Zissou1", type = "continuous"))
 
-```
-
-
-```{r}
-# Init Ggplot
-gg_ngs<-ggplot(data = ngs, aes(x = machine_price_USD, y = average_price_per_Gb_USD, color = company, size = reagent_max_price_USD)) +
-  geom_text_repel(aes(label = platform, size = 100, segment.alpha = 0.2), 
-                  show.legend = F, #removes an 'a' in legend points
-                  force = 40, 
-                  force_pull = 2, 
-                  segment.angle = 1,
-                  segment.ncp = 10) + 
-  geom_point(alpha = 0.6) + #alpha is transparency
-  scale_fill_manual(values = wes_palette(name = "Chevalier1", type = "continuous"), name = "") +
-  labs(title = "Average Cost Per Gigabase (Gb) vs Initial Cost of Sequencing Platform",
-         x = "Initial Cost of Sequencing Platform USD",
-         y = "Average Cost Per Gb USD") +
-  guides(colour = guide_legend(title = "Company", order = 1), size = guide_legend(title = "Max cost of reagents", order = 2))
-gg_ngs
-```
-
-
-```{r}
-# same plot but fixed size legend 
-gg_ngs2<-ggplot(data = ngs, 
-                aes(x = machine_price_USD, y = average_price_per_Gb_USD, color = company)) +
-  geom_text_repel(aes(label = platform, size = 1000, segment.alpha = 0.2), 
-                  show.legend = F, #removes an 'a' in legend points
-                  force = 40, 
-                  force_pull = 2, 
-                  segment.angle = 1,
-                  segment.ncp = 10) + 
-  geom_point(alpha = 0.6, #transparency
-             aes(size=reagent_max_price_USD)) + 
-  scale_radius(limits = c(0, NA), 
-               breaks = c(0, 100, 1000, 5000, 10000, 20000, 25000)) + #specifies categories of legend point sizes
-  labs(title = "Average Cost Per Gigabase vs Initial Cost of Sequencing Platform",
-         x = "Initial Cost of Sequencing Platform USD",
-         y = "Average Cost Per Gb USD") +
-    guides(colour = guide_legend(title = "Company", order = 1), 
-           size = guide_legend(title = "Max cost of reagents", order = 2))
-gg_ngs2
-```
-
-```{r}
-# size scaled appropriately so as not to be misleading 
-gg_ngs2<-ggplot(data = ngs, 
-                aes(x = machine_price_USD, y = average_price_per_Gb_USD, color = company)) +
-  geom_text_repel(aes(label = platform, size = 550, segment.alpha = 0.2), 
-                  show.legend = F, #removes an 'a' in legend points
-                  force = 40, 
-                  force_pull = 2, 
-                  segment.angle = 1,
-                  segment.ncp = 10) + 
-  geom_point(alpha = 0.6, #transparency
-             aes(size=reagent_max_price_USD)
-             ) + 
-  scale_radius(limits = c(0, NA),
-               breaks = c(100, 1500, 25000), #specifies categories of legend point sizes
-               labels = c("Minimum $67.50","Median $1,400","Maximum $29,020"),
-               ) + 
-  labs(title = "Average Cost Per Gb vs Initial Cost of Sequencing Platform",
-         x = "Initial Cost of Sequencing Platform (USD)",
-         y = "Average Cost Per Gb (USD)") +
-    guides(colour = guide_legend(title = "Company", order = 1), 
-           size = guide_legend(title = "Maximum cost of reagents per run (USD)", order = 2)) +
-  scale_y_continuous(limits=c(0, 650), breaks=seq(0,650,100))
-gg_ngs2
-```
 
 ```{r}
 # size scaled appropriately so as not to be misleading, no cost reagent size
 gg_ngs2<-ggplot(data = ngs, 
                 aes(x = machine_price_USD, y = average_price_per_Gb_USD, color = company)) +
-  geom_text_repel(aes(label = platform, segment.alpha = 0.2),
+  geom_text_repel(aes(label = platform, size = 550, segment.alpha = 0.2),
                   size = 1.8,
                   show.legend = F, #removes an 'a' in legend points
                   force = 40, 
@@ -201,29 +148,90 @@ gg_ngs2<-ggplot(data = ngs,
 gg_ngs2
 ```
 ```{r}
-#### with nice colous. 
+#### with company colours colous. 
 # size scaled appropriately so as not to be misleading, no cost reagent size
+library(ggrepel)
 
 gg_ngs2<-ggplot(data = ngs, 
                 aes(x = machine_price_USD, y = average_price_per_Gb_USD, color = company)) +
-  geom_text_repel(aes(label = platform, segment.alpha = 1),
+  geom_text_repel(aes(label = platform, size = 550, segment.alpha = 0.2),
                   size = 1.8,
                   show.legend = F, #removes an 'a' in legend points
-                  force = 40, 
-                  force_pull = 2, 
+                  force = 50, 
+                  force_pull = 0, 
                   segment.angle = 1,
-                  segment.ncp = 10,
-                  color = wes_palette(19, name = "BottleRocket2", type = "continuous")) + #wtf
-  geom_point(alpha = 1, color = wes_palette(19, name = "BottleRocket2", type = "continuous")) + #transparency
-  scale_fill_manual(values = wes_palette(name = "BottleRocket2")) + 
+                  segment.ncp = 10) + #point colour +
+  geom_point(alpha = 0.6) + #transparency
+  scale_color_manual(values=cp) +
   labs(title = "Average Cost Per Gb vs Initial Cost of Sequencing Platform",
          x = "Initial Cost of Sequencing Platform (USD)",
          y = "Average Cost Per Gb (USD)") +
   guides(color = guide_legend(title = "Company")) +
   scale_y_continuous(limits=c(0, 650), breaks=seq(0,650,100))
+
 gg_ngs2
 
-##### abandoning plot will use original, no time to sus colours with grepel and 19 vs. 3 pts and alpha confusion 
+#ggsave("cost_v_Gb.tiff", units="in", width=10, height=4, dpi=300, compression = 'lzw')
+
+```
+
+```{r}
+## rem bg
+library(ggrepel)
+
+gg_ngs2<-ggplot(data = ngs, 
+                aes(x = machine_price_USD, y = average_price_per_Gb_USD, color = company)) +
+  geom_text_repel(aes(label = platform, size = 550, segment.alpha = 0.2),
+                  size = 1.8,
+                  show.legend = F, #removes an 'a' in legend points
+                  force = 50, 
+                  force_pull = 0, 
+                  segment.angle = 1,
+                  segment.ncp = 10) + #point colour +
+  geom_point(alpha = 0.6) + #transparency
+  scale_color_manual(values=cp) +
+  labs(title = "                              Average Cost Per Gb vs Initial Cost of Sequencing Platform",
+         x = "Initial Cost of Sequencing Platform (USD)",
+         y = "Average Cost Per Gb (USD)") +
+  guides(color = guide_legend(title = "Company")) +
+  scale_y_continuous(limits=c(0, 650), breaks=seq(0,650,100)) +
+    theme( # remove the horizontal grid lines
+         panel.grid.major.y = element_line( size=.1, color="grey"),
+         panel.grid.minor.x = element_line(),
+         panel.grid.major.x = element_line( size=.1, color="grey"), # explicitly set the horizontal lines (or they will disappear too)
+         panel.background = element_blank(),
+#         panel.border = element_rect(color = "grey")
+    )
+
+gg_ngs2
+
+ggsave("cost_v_Gb2.tiff", units="in", width=10, height=4, dpi=300, compression = 'lzw')
+
+
+```
+
+## test
+```{r}
+set.seed(1)
+library(ggplot2)
+library(ggrepel)
+df <- data.frame(n=runif(8),y=1:8,l=letters[1:8],col=palette.colors(8))
+
+p_vol <- ggplot(df, aes(n, y, label = l)) +
+  geom_point(aes(fill=l),color = df$col) +
+  geom_text_repel(col=df$col)+theme_classic()
+print(p_vol)
+
+##
+p_vol2 <- ggplot(df, aes(n, y, label = l)) +
+  geom_point(aes(fill=l, color = l)) +
+  geom_text_repel(col=df$col) +
+  theme_classic() +
+  scale_fill_manual(values=c("#CC0000", "#006600", "#669999", "#00CCCC", 
+                             "#660099", "#CC0066", "#FF9999", "#FF9900"))
+print(p_vol2)
+
+
 ```
 
 ```{r}
@@ -239,11 +247,11 @@ ngs
 p<-ggplot(data=ngs, aes(x=reorder(platform, number_of_Gb_for_1k_USD), y=number_of_Gb_for_1k_USD, fill=company)) +
   geom_bar(stat="identity", width=0.5) +
   coord_flip() +
-  labs(title = "       Gigabases (Gb) Per $1,000 USD",
+  labs(title = "                            Gigabases (Gb) Per $1,000 USD",
          x =  "Sequencing Platform",
          y = "Average Number of Gb per $1,000 USD") +
   guides(fill = guide_legend(title = "Company")) +
-  scale_fill_manual(values = wes_palette(name = "Chevalier1"), name = "") +
+  scale_fill_manual(values = cp, name = "") +
   theme( # remove the horizontal grid lines
          panel.grid.major.y = element_blank(),
          panel.grid.minor.x = element_line(),
@@ -254,10 +262,10 @@ p<-ggplot(data=ngs, aes(x=reorder(platform, number_of_Gb_for_1k_USD), y=number_o
 #  scale_x_binned(c(0,150))
   
 p
+ggsave("gb1k.tiff", units="in", width=10, height=4, dpi=300, compression = 'lzw')
+
 ```
-```{r}
-names(wes_palettes)
-```
+
 
 ```{r}
 ## get values
@@ -268,20 +276,54 @@ platform <- c("Illumina NovaSeq S4", "ONT PromethION", "PACB 8M Sequel II v2.0 c
 
 
 ```{r}
+library(ggplot2)
 library(reshape2)
+library(wesanderson)
 
 df1 <- data.frame(Minimum, Maximum, platform)
 df_hg <- melt(df1, id.vars='platform')
 
 ggplot(df_hg, aes(x=platform, y=value, fill=variable)) +
   geom_bar(stat='identity', position='dodge') +
-  scale_fill_manual(values = wes_palette(name = "Chevalier1"), name = "") +
+  scale_fill_manual(values = cp, name = "") +
   coord_flip() +
     labs(title = "Cost of Sequencing a Human Genome (USD)",
          x =  "Sequencing Platform",
          y = "Cost (USD)") +
   guides(fill = guide_legend(title = ""))
+
+ggsave("cost_seq_hg.tiff", units="in", width=10, height=4, dpi=300, compression = 'lzw')
+
 ```
 
+
+```{r}
+library(reshape2)
+
+df1 <- data.frame(Minimum, Maximum, platform)
+df_hg <- melt(df1, id.vars='platform')
+```
+
+
+```{r}
+g2 <- ggplot(df_hg, aes(x=platform, y=value, fill=variable)) +
+  geom_bar(stat='identity', position='dodge') +
+  coord_flip() +
+  labs(title = "                           Cost of Sequencing a Human Genome (USD)",
+         x =  "Sequencing Platform",
+         y = "Cost (USD)") +
+  guides(fill = guide_legend(title = "")) +
+  scale_fill_manual(values = cp, name = "") +
+  theme( # remove the horizontal grid lines
+         panel.grid.major.y = element_blank(),
+         panel.grid.minor.x = element_line(),
+         panel.grid.major.x = element_line( size=.1, color="grey"), # explicitly set the horizontal lines (or they will disappear too)
+         panel.background = element_blank(),
+#         panel.border = element_rect(color = "grey")
+    )
+g2
+ggsave("hg_cost.tiff", units="in", width=10, height=4, dpi=300, compression = 'lzw')
+
+```
 
 
